@@ -1,6 +1,8 @@
 all: exe
 
-compile:
+clear:
+	clear
+compile: clear
 	g++ -O0 -o main main.cpp
 
 exe: compile
