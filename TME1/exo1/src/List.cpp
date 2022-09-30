@@ -1,3 +1,5 @@
+//Erreur: la list n'etait pas include 
+#include "List.h"
 
 namespace pr {
 
@@ -11,17 +13,18 @@ size_t Chainon::length() {
 	}
 	return length();
 }
-
-void Chainon::print (std::ostream & os) {
+//erreur il manquait le const a la declaration
+void Chainon::print (std::ostream & os) const {
 	os << data ;
 	if (next != nullptr) {
 		os << ", ";
+		//errreur le print etait en dehors du if 
+		next->print(os);
 	}
-	next->print(os);
 }
 
 // ******************  List
-const std::string & List::operator[] (size_t index) const  {
+const std::string & List::operator[] (size_t index) const {
 	Chainon * it = tete;
 	for (size_t i=0; i < index ; i++) {
 		it = it->next;
@@ -45,7 +48,8 @@ void List::push_front (const std::string& val) {
 	tete = new Chainon(val,tete);
 }
 
-bool empty() {
+//Il manquait le list::
+bool List::empty() {
 	return tete == nullptr;
 }
 
@@ -57,9 +61,9 @@ size_t List::size() const {
 	}
 }
 
-} // namespace pr
 
-std::ostream & operator<< (std::ostream & os, const pr::List & vec)
+
+std::ostream & operator << (std::ostream & os, const pr::List & vec)
 {
 	os << "[";
 	if (vec.tete != nullptr) {
@@ -69,3 +73,4 @@ std::ostream & operator<< (std::ostream & os, const pr::List & vec)
 	return os;
 }
 
+} // namespace pr

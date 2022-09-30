@@ -6,12 +6,13 @@
 int main () {
 
 	std::string abc = "abc";
-	char * str = new char [3];
+	char * str = new char [4];
 	str[0] = 'a';
 	str[1] = 'b';
 	str[2] = 'c';
+	str[3] = '\0';
 	size_t i = 0;
-
+	//erreur il manquait les caractére de fin de chaine dans str
 	if (! strcmp (str, abc.c_str())) {
 		std::cout << "Equal !";
 	}

@@ -35,9 +35,8 @@ public:
 
 	void push_back (const std::string& val) ;
 
-	void push_front (const std::string& val) {
-		tete = new Chainon(val,tete);
-	}
+	//Erreur les push front etait écrit dans le header
+	void push_front (const std::string& val);
 
 	bool empty() ;
 
