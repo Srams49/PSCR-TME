@@ -108,6 +108,13 @@ int main () {
 	cout << "Nombre d'occurrence de peace " << ((nbpeace == nullptr) ?  0 :*nbpeace )<< endl;
 	cout << "Nombre d'occurrence de toto " << ((nbtoto == nullptr) ?  0 :*nbtoto) << endl;
 
+	std::vector<std::pair<string,int>> vector = (*hash).copieVector();
+
+	std::sort(vector.begin(), vector.end(), [] (const pair<string,int> a, const pair<string,int> b) { return a.second > b.second;});
+
+	for (int i = 0 ; i<10;i++){
+		cout << "Mot numero " <<i+1 <<" en frequence est " <<  vector.at(i).first <<" avec "<<vector.at(i).second<<" occurence" <<endl;
+	}
 
     return 0;
 }
