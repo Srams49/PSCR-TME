@@ -14,6 +14,7 @@ class Queue {
 	size_t begin;
 	size_t sz;
 	mutable std::mutex m;
+	bool block;
 
 	// fonctions private, sans protection mutex
 	bool empty() const {
@@ -26,6 +27,7 @@ public:
 	Queue(size_t size) :allocsize(size), begin(0), sz(0) {
 		tab = new T*[size];
 		memset(tab, 0, size * sizeof(T*));
+		block=false;
 	}
 	size_t size() const {
 		std::unique_lock<std::mutex> lg(m);
@@ -33,7 +35,7 @@ public:
 	}
 	T* pop() {
 		std::unique_lock<std::mutex> lg(m);
-		if (empty()) {
+		if (block and empty()) {
 			return nullptr;
 		}
 		auto ret = tab[begin];
@@ -44,7 +46,7 @@ public:
 	}
 	bool push(T* elt) {
 		std::unique_lock<std::mutex> lg(m);
-		if (full()) {
+		if (block and  full()) {
 			return false;
 		}
 		tab[(begin + sz) % allocsize] = elt;
@@ -58,6 +60,10 @@ public:
 			delete tab[ind];
 		}
 		delete[] tab;
+	}
+	void SetBlocking(bool isBlocking){
+		std::unique_lock<std::mutex> lg(m);
+		block = isBlocking;
 	}
 };
 
