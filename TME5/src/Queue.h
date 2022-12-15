@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <mutex>
+#include <cstring>
 
 namespace pr {
 
@@ -14,8 +15,8 @@ class Queue {
 	size_t begin;
 	size_t sz;
 	mutable std::mutex m;
-	bool block;
-
+	std::condition_variable cond;
+	bool bloquer;
 	// fonctions private, sans protection mutex
 	bool empty() const {
 		return sz == 0;
@@ -27,28 +28,53 @@ public:
 	Queue(size_t size) :allocsize(size), begin(0), sz(0) {
 		tab = new T*[size];
 		memset(tab, 0, size * sizeof(T*));
-		block=false;
+		bloquer=true;
 	}
+
 	size_t size() const {
 		std::unique_lock<std::mutex> lg(m);
 		return sz;
 	}
+	
 	T* pop() {
 		std::unique_lock<std::mutex> lg(m);
-		if (block and empty()) {
-			return nullptr;
+
+		while (bloquer && empty()) {
+			cond.wait(lg);
 		}
-		auto ret = tab[begin];
+        
+		if(!bloquer){
+            return nullptr;
+        }
+
+        if(full()){
+            cond.notify_all();
+        }
+		
+        auto ret = tab[begin];
 		tab[begin] = nullptr;
 		sz--;
 		begin = (begin + 1) % allocsize;
 		return ret;
+
 	}
-	bool push(T* elt) {
+	
+    bool push(T* elt) {
 		std::unique_lock<std::mutex> lg(m);
-		if (block and  full()) {
-			return false;
+		
+        while (bloquer && full()) {
+			cond.wait(lg);
 		}
+        
+		if(full()){
+            return false;
+        }
+
+        if(empty()){
+            cond.notify_all();
+        }
+
+
 		tab[(begin + sz) % allocsize] = elt;
 		sz++;
 		return true;
@@ -61,9 +87,9 @@ public:
 		}
 		delete[] tab;
 	}
-	void SetBlocking(bool isBlocking){
+	void setBlocking(bool isBlocking){
 		std::unique_lock<std::mutex> lg(m);
-		block = isBlocking;
+		bloquer = isBlocking;
 	}
 };
 

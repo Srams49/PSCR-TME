@@ -1,9 +1,6 @@
 #include "Vec3D.h"
 #include "Rayon.h"
 #include "Scene.h"
-#include "Job.h"
-#include "Queue.h"
-#include "Pool.h"
 #include <iostream>
 #include <algorithm>
 #include <fstream>
@@ -163,4 +160,3 @@ int main () {
 
 	return 0;
 }
-

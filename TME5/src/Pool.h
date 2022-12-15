@@ -8,6 +8,7 @@
 namespace pr {
 void poolWorker(Queue<Job>& queue ){
 		while(true){
+			std::cout<<i<<std::endl;
 			Job*j=queue.pop();
 			if(j==nullptr){break;}
 			j->run();
@@ -19,22 +20,30 @@ class Pool {
 	std::vector<std::thread> threads;
 	
 public:
-	Pool(int qsize) ;
+	Pool(int qsize):queue(qsize){	};
+
 	void start (int nbthread){
+		threads.reserve(nbthread);
 		for(int i=0;i<nbthread;i++){
-			threads.emplace_back(poolWorker,queue);
+			threads.emplace_back(poolWorker,std::ref(queue));
 		}
 	};
+
 	void submit (Job * job){
-		//threads.emplace_back(job);
+		queue.push(job);
 	};
+
 	void stop(){
-		queue.SetBlocking(false);
+		
+		queue.setBlocking(false);
 		for(auto& t:threads){
 			t.join();
 		}
-	} ;
-	~Pool() ;
+		std::cout<<"sort"<<std::endl;
+		threads.clear();
+	};
+	
+	~Pool(){} ;
 };
 
 }
